@@ -1,0 +1,5 @@
+model,track,mean AUC
+BiLSTM,With Emoji,0.788
+BiLSTM,Without Emoji,0.786
+Transformer,With Emoji,0.777
+Transformer,Without Emoji,0.754

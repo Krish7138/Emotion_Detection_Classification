@@ -1,0 +1,7 @@
+property,value,justifies,% of split
+mean characters,95.2,sequence length of 128 tokens is ample,1.4
+mean words,16.1,short texts: every token matters,0.2
+contains a URL,0.0,URL stripping,0.0
+contains @mention,3061.0,mention stripping + de-identification,44.8
+contains #hashtag,2998.0,"keep the word, drop the # symbol",43.8
+contains emoji,770.0,the manipulated variable of this study,11.3

@@ -1,0 +1,4 @@
+split,tweets,with emoji,% with emoji
+train,6838,770,11.3
+dev,886,220,24.8
+test,3259,799,24.5

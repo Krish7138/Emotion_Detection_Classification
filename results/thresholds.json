@@ -1,0 +1,6 @@
+{
+  "LSTM_no_emoji": 0.55,
+  "LSTM_with_emoji": 0.55,
+  "BERT_no_emoji": 0.55,
+  "BERT_with_emoji": 0.55
+}

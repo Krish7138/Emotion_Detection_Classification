@@ -1,0 +1,5 @@
+Model,Track,Micro F1,Macro F1,Label Accuracy,Subset Accuracy,Precision,Recall,Threshold
+BiLSTM,Without Emoji,53.63,47.86,74.02,5.53,44.38,67.75,0.55
+BiLSTM,With Emoji,55.65,48.86,75.85,9.48,46.93,68.35,0.55
+Transformer,Without Emoji,47.29,44.36,70.19,1.81,38.9,60.3,0.55
+Transformer,With Emoji,51.0,47.3,72.63,3.39,42.29,64.23,0.55

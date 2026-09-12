@@ -1,0 +1,19 @@
+{
+  "cases": [
+    {
+      "input": "I'm so happy today 😂😭 u cant believe it!! #joy @friend http://x.com",
+      "track_a": "i m so happy today you cannot believe it joy",
+      "track_b": "i m so happy today face with tear of joy loudly cry face you cannot believe it joy"
+    },
+    {
+      "input": "waiting to hear back 😰 fingers crossed",
+      "track_a": "waiting to hear back finger crossed",
+      "track_b": "waiting to hear back anxious face with sweat finger crossed"
+    },
+    {
+      "input": "absolutely gutted about the result today",
+      "track_a": "absolutely gutted about the result today",
+      "track_b": "absolutely gutted about the result today"
+    }
+  ]
+}
