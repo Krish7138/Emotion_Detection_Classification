@@ -28,7 +28,7 @@ schema, and refuse to continue if anything is wrong.
 
 **It deliberately does not touch the text.** No cleaning, no lowercasing, no
 emoji handling. That is `03`'s job. Keeping the text pristine here is what lets
-`02_eda.ipynb` profile the corpus *as it actually arrived* — if this notebook
+`02_eda.ipynb` profile the corpus *as it actually arrived* - if this notebook
 stripped URLs, the EDA could never tell you how many tweets contained one.
 
 ---
@@ -56,7 +56,7 @@ possible by simple concatenation.
 `display_path()` prints paths relative to the project root, so machine-specific
 parent folders never leak into saved notebook output.
 
-### 1.1 — Locate the source files
+### 1.1 - Locate the source files
 
 `find_file()` searches the candidate roots **recursively** (`rglob`). That
 recursion exists for Kaggle, which nests attached datasets under
@@ -87,7 +87,7 @@ eleven emotion columns are present in all three splits. A missing column here
 would otherwise surface much later as a silent `KeyError` in the middle of a
 training run.
 
-### 1.4 — Normalise the emotion labels
+### 1.4 - Normalise the emotion labels
 
 ```python
 df[col] = df[col].replace("NONE", 0)
@@ -99,7 +99,7 @@ The assertion that follows is the important part: every label cell must be
 exactly `0` or `1`. If a stray value survived, the class weights computed in `03`
 and every F1 in `04` would be wrong.
 
-### 1.5 — Integrity checks
+### 1.5 - Integrity checks
 
 Produces this table:
 
@@ -146,7 +146,7 @@ No figures.
 
 ## Things worth knowing
 
-**The split sizes are lopsided.** Dev is 886 rows — 8.1% of the corpus. Every
+**The split sizes are lopsided.** Dev is 886 rows - 8.1% of the corpus. Every
 headline number in the study is measured on those 886 rows, which is the main
 reason `04` reports the effect as indicative rather than confirmed.
 
@@ -155,7 +155,7 @@ reason `04` reports the effect as indicative rather than confirmed.
 them. `03` reads them straight back with pandas' UTF-8 default, which is correct
 on all three platforms the project runs on.
 
-**Re-running is safe.** The notebook is a pure function of `data/raw/` — it
+**Re-running is safe.** The notebook is a pure function of `data/raw/` - it
 overwrites `data/interim/` and holds no state.
 
 **If an assertion fires, stop.** Each one guards an invariant that later
