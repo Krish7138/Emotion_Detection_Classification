@@ -1,4 +1,4 @@
-# `01_data_load.ipynb` — Explanation
+# `01_data_load.ipynb` - Explanation
 
 **Stage 1 of 5.** Load the corpus, standardise its schema, normalise the labels,
 prove the data is intact, and write a clean interim copy that every later stage
@@ -8,7 +8,7 @@ reads.
 |---|---|
 | **Input** | `data/raw/SemEval2018-Task1-{train,dev,test}.txt` (tab separated) |
 | **Output** | `data/interim/{train,dev,test}_raw.csv` |
-| **Figures** | none — this stage plots nothing |
+| **Figures** | none - this stage plots nothing |
 | **Next** | `02_eda.ipynb` |
 | **Runtime** | a few seconds, CPU only |
 
@@ -35,7 +35,7 @@ stripped URLs, the EDA could never tell you how many tweets contained one.
 
 ## Walk-through
 
-### Cell 1 — the shared header
+### Cell 1 - the shared header
 
 Every notebook in the project opens with the same block. It detects Kaggle
 (`/kaggle/working` exists) and picks the project root accordingly, otherwise it
@@ -50,7 +50,7 @@ TRACKS = [("no_emoji",   "text_no_emoji",   "Without Emoji"),
 ```
 
 `TRACKS` is unused here but is kept identical across all four notebooks so the
-header can be copied verbatim — that is also what makes `kaggle_run_all.ipynb`
+header can be copied verbatim - that is also what makes `kaggle_run_all.ipynb`
 possible by simple concatenation.
 
 `display_path()` prints paths relative to the project root, so machine-specific
@@ -66,7 +66,7 @@ finds them in `data/raw/`.
 If any of the three is missing the notebook raises `FileNotFoundError` with
 instructions rather than failing later with a confusing pandas error.
 
-### 1.2 — Load
+### 1.2 - Load
 
 Read with `sep="\t"`. Observed shapes:
 
@@ -80,7 +80,7 @@ test   (3259, 13)
 `krish.ipynb` exactly, which is the check that `download_data.py` fetched the
 same corpus the reported results came from.
 
-### 1.3 — Standardise column names
+### 1.3 - Standardise column names
 
 Lowercase everything, rename `Tweet` → `text`. Then an assertion confirms all
 eleven emotion columns are present in all three splits. A missing column here
@@ -121,7 +121,7 @@ Two things to read off it:
 * **Mean labels per tweet ≈ 2.4**, so this is a genuine multi-label problem, not
   a multi-class one dressed up. `02` quantifies that properly.
 
-### 1.6 — Save the interim copy
+### 1.6 - Save the interim copy
 
 Writes `id`, `text` and the eleven label columns to
 `data/interim/{split}_raw.csv` in UTF-8. UTF-8 matters — the emoji have to
@@ -137,7 +137,7 @@ Resulting sizes: `train_raw.csv` 899 KB, `test_raw.csv` 427 KB, `dev_raw.csv`
 | Path | Rows | What it is |
 |---|---|---|
 | `data/interim/train_raw.csv` | 6,838 | training split, schema-normalised, text untouched |
-| `data/interim/dev_raw.csv` | 886 | development split — every reported metric comes from this |
+| `data/interim/dev_raw.csv` | 886 | development split - every reported metric comes from this |
 | `data/interim/test_raw.csv` | 3,259 | held-out test split, deliberately unused until `04` §4.9 |
 
 No figures.
