@@ -1,7 +1,7 @@
-# `02_eda.ipynb` — Explanation
+# `02_eda.ipynb` - Explanation
 
 **Stage 2 of 5.** Profile the corpus *before* any text is modified. Every figure
-here exists to justify — or fail to justify — a decision made in `03` or a caveat
+here exists to justify - or fail to justify - a decision made in `03` or a caveat
 stated in `04`.
 
 | | |
@@ -32,7 +32,7 @@ reported for all three splits.
 
 ## Walk-through
 
-### 2.1 — Split sizes
+### 2.1 - Split sizes
 
 | split | tweets | share % |
 |---|---|---|
@@ -44,7 +44,7 @@ Note the shape of this: the development split is the smallest of the three, yet
 it carries all model selection, all threshold tuning and all reported metrics.
 That is a real limitation, and `04` §4.8 states it explicitly.
 
-### 2.2 — Label distribution → `figures/label_distribution.png`
+### 2.2 - Label distribution → `figures/label_distribution.png`
 
 Counts positive instances per emotion in the training split.
 
@@ -55,7 +55,7 @@ imbalance ratio: 7.3 : 1
 ```
 
 **Consequence.** A 7.3:1 spread means an unweighted binary cross-entropy is
-minimised most efficiently by predicting "no" for `trust` on every single row —
+minimised most efficiently by predicting "no" for `trust` on every single row -
 that alone scores about 95% accuracy on that label. The notebook prints the
 verdict directly:
 
@@ -64,7 +64,7 @@ verdict directly:
 `03` acts on this in two places: a per-label `pos_weight` (§3.3) and a swept
 decision threshold rather than a fixed 0.5 (§3.5).
 
-### 2.3 — Multi-label structure → `figures/label_cardinality.png`
+### 2.3 - Multi-label structure → `figures/label_cardinality.png`
 
 How many emotions ride on one tweet?
 
@@ -79,7 +79,7 @@ reduced to single-label classification, and plain accuracy is meaningless as a
 headline. `04` reports Micro-F1 and Macro-F1 with independent per-label decisions
 instead.
 
-### 2.4 — Label co-occurrence → `figures/label_cooccurrence.png`
+### 2.4 - Label co-occurrence → `figures/label_cooccurrence.png`
 
 A heatmap of `P(column emotion | row emotion)`, diagonal blanked out. The
 strongest pairs:
@@ -95,18 +95,18 @@ strongest pairs:
 
 **Consequence.** These are near-deterministic implications: 94% of tweets labelled
 `love` are also labelled `joy`. Two things follow. First, they explain confusions
-that appear in `04`'s confusion matrices — a model firing `joy` on a `love` tweet
+that appear in `04`'s confusion matrices - a model firing `joy` on a `love` tweet
 is following the data, not malfunctioning. Second, the architecture used here
 predicts each label with an independent output unit and so cannot represent
 `love → joy` directly; it has to relearn it from the text every time. That is
 known headroom, not a bug.
 
-### 2.5 — Text noise → `figures/text_length.png`, `results/eda_text_quality.csv`
+### 2.5 - Text noise → `figures/text_length.png`, `results/eda_text_quality.csv`
 
 | property | value | % of split | justifies |
 |---|---|---|---|
-| mean characters | 95.2 | — | sequence length of 128 tokens is ample |
-| mean words | 16.1 | — | short texts: every token matters |
+| mean characters | 95.2 | - | sequence length of 128 tokens is ample |
+| mean words | 16.1 | - | short texts: every token matters |
 | contains a URL | 0 | 0.0 | URL stripping |
 | contains @mention | 3,061 | 44.8 | mention stripping + de-identification |
 | contains #hashtag | 2,998 | 43.8 | keep the word, drop the `#` |
@@ -117,23 +117,23 @@ known headroom, not a bug.
 * **Mean 16 words.** A 128-token sequence length sits far above the tail, so
   effectively nothing is truncated. Also worth noticing: with only 16 tokens to
   work with, adding two or three emoji-description tokens is a *large* relative
-  change to a tweet's content — which is why the per-tweet effect can be big even
+  change to a tweet's content - which is why the per-tweet effect can be big even
   when the corpus-wide effect is small.
 * **Zero URLs.** The release already stripped them. The URL regex in `03` is
-  therefore dead code on this corpus — it is retained because
+  therefore dead code on this corpus - it is retained because
   `app/preprocessing.py` must mirror `03` exactly, and the app *does* see user
   text containing URLs.
 * **44.8% contain an @mention.** This is the preprocessing stage that does real
   work, and it doubles as de-identification: removing handles removes the most
   obvious personal identifier in the corpus.
 * **43.8% contain a hashtag.** Hashtags are frequently the emotional payload
-  (`#joy`), so the `#` symbol is dropped and the word kept — deleting the whole
+  (`#joy`), so the `#` symbol is dropped and the word kept - deleting the whole
   token would throw away signal.
 
 > ⚠️ **Caveat on the saved CSV.** The `% of split` column is computed as
 > `100 × value / len(train)` for *every* row, so it is only meaningful for the
 > four count rows. The `1.4` and `0.2` against "mean characters" and "mean words"
-> are an artefact of that formula — ignore them and cite the raw `value` for
+> are an artefact of that formula - ignore them and cite the raw `value` for
 > those two.
 
 ### 2.6 — Emoji density → `results/eda_emoji_density.csv`
@@ -158,7 +158,7 @@ training rows carry emoji, but roughly 25% of dev and test rows do. So the
 *training* signal is thin while the *evaluation* set is comparatively rich in
 emoji-bearing rows. The dilution argument is real, but on the split the metrics
 actually come from it is about 75%, not 89%. This asymmetry is a property of the
-official release rather than anything the notebook does — but it should be stated
+official release rather than anything the notebook does - but it should be stated
 whenever the 11.3% figure is quoted as the study's ceiling.
 
 ### Which emoji appear?
@@ -173,7 +173,7 @@ whenever the 11.3% figure is quoted as the study's ceiling.
 | 😩 | 38 | weary face |
 | 😊 | 24 | smiling face with smiling eyes |
 
-The distribution is steep — one emoji accounts for roughly 15% of all
+The distribution is steep - one emoji accounts for roughly 15% of all
 emoji-bearing tweets. Track B converts these to text (`face with tears of joy`),
 so those exact description words are what the model gets a chance to learn from,
 and only the head of this distribution appears often enough to be learnable at
@@ -201,9 +201,9 @@ percentage points:
 **Consequence.** The emoji subset is emotionally skewed, and strongly so. Emoji
 usage clusters on `joy`, `love` and `sadness`, and is *avoided* on `disgust` and
 `anger`. This is a prediction made before any model is trained: the manipulation
-can only plausibly move labels it has coverage of. `04` bears it out — `sadness`
-moved most (mean ΔF1 +7.58) and `joy` gained (+1.89), while `anger` (−0.05) and
-`surprise` (−1.01) barely moved or went backwards.
+can only plausibly move labels it has coverage of. `04` bears it out - `sadness`
+moved most (mean ΔF1 +7.58) and `joy` gained (+1.89), while `anger` (-0.05) and
+`surprise` (-1.01) barely moved or went backwards.
 
 ---
 
@@ -232,7 +232,7 @@ for Kaggle. Locally it is already in `requirements.txt`.
 **Emoji are detected two different ways in this notebook.** The `has_emoji`
 column uses a regex range, `[\U0001F300-\U0001FAFF]`, while the "which emoji
 appear" section uses `emoji.distinct_emoji_list()`. The regex misses emoji
-outside that block — older ones such as ❤ (U+2764) and ✨ (U+2728) — so 11.3% is a
+outside that block - older ones such as ❤ (U+2764) and ✨ (U+2728) - so 11.3% is a
 slight **undercount**. `03` reports a marginally higher figure (12.1% of training
 rows genuinely differ between the tracks) precisely because its pipeline uses the
 library rather than the regex. The two should agree within about a point; if they
@@ -242,4 +242,4 @@ ever diverge further, the regex is the one to distrust.
 in-memory `train` DataFrame (`has_url`, `has_emoji`, …) but never writes them
 back. `03` re-reads `data/interim/` from disk.
 
-**Re-running is safe and fast** — no model loading, no GPU.
+**Re-running is safe and fast** - no model loading, no GPU.
