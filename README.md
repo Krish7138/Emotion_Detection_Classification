@@ -15,7 +15,7 @@ split into a five-stage pipeline.
 | 1 | `notebooks/01_data_load.ipynb` | Load the corpus, standardise columns, normalise labels, integrity checks |
 | 2 | `notebooks/02_eda.ipynb` | Profile the raw corpus: label imbalance, co-occurrence, text noise, emoji density |
 | 3 | `notebooks/03_model_train.ipynb` | Preprocessing (the two tracks), both architectures, tuning, **saves models + thresholds** |
-| 4 | `notebooks/04_evaluation.ipynb` | Score all four conditions, ΔF1, confusion matrices, ROC — writes tables and figures |
+| 4 | `notebooks/04_evaluation.ipynb` | Score all four conditions, ΔF1, confusion matrices, ROC - writes tables and figures |
 | 5 | `app/streamlit_app.py` | The UI: a text box, the trained model behind it |
 
 Plus `download_data.py`, which fetches the corpus.
@@ -24,7 +24,7 @@ Each stage reads what the previous one wrote, so **run them in order**. Stage 3 
 the only one the UI strictly needs.
 
 **Notebook documentation.** [`notebooks/README.md`](notebooks/README.md) lists what
-every notebook writes — outputs and figures — alongside the headline results, and
+every notebook writes - outputs and figures - alongside the headline results, and
 each notebook has a companion section-by-section walk-through:
 [01](notebooks/01_data_load_explanation.md) ·
 [02](notebooks/02_eda_explanation.md) ·
@@ -58,7 +58,7 @@ streamlit run app/streamlit_app.py
 ```
 
 That is the whole sequence. The app needs **no copying, no extra scripts and no
-manual threshold step** — notebook 03 writes its artefacts directly into the
+manual threshold step** - notebook 03 writes its artefacts directly into the
 folders the app already reads.
 
 ## How the data flows
@@ -87,7 +87,7 @@ description (`😂` → `face with tears of joy`). Everything upstream and downs
 is identical, so the only systematic difference between the two corpora is whether
 emoji content survives as text. Each track then trains both architectures under
 an identical protocol, giving four comparable conditions and a clean difference
-measure, `ΔF1 = F1(with emoji) − F1(without emoji)`.
+measure, `ΔF1 = F1(with emoji) - F1(without emoji)`.
 
 ## Where the data comes from
 
@@ -105,7 +105,7 @@ and extracts the three English E-c files, renaming them to the names above:
 | `English/E-c/2018-E-c-En-test-gold.txt` | `SemEval2018-Task1-test.txt` |
 
 Row counts (6,838 / 886 / 3,259) match the original notebook exactly, as does the
-first training row — this is the same corpus the reported results were produced
+first training row - this is the same corpus the reported results were produced
 from.
 
 If that host is unreachable, the same data is mirrored at:
@@ -132,7 +132,7 @@ datasets via **+ Add Input**:
 
 The wheels dataset exists because Kaggle grants notebook **internet only to
 phone-verified accounts**. Without it `pip install demoji` fails with a DNS
-error, and without internet the corpus cannot be downloaded either — hence
+error, and without internet the corpus cannot be downloaded either - hence
 shipping both as datasets. If your account *is* verified you can switch Internet
 on instead and skip both.
 
@@ -155,7 +155,7 @@ is also why its absolute scores sit below published state of the art.
 positive-weighted loss, so the threshold that maximises Micro-F1 is not 0.5 and is
 swept per condition instead. Together with the loss weighting, that is what makes
 rare emotions (*trust*, *surprise*, *pessimism*) predictable at all. In the shipped
-run all four conditions selected **0.55** — the top of the swept range
+run all four conditions selected **0.55** - the top of the swept range
 (`0.10 … 0.55`), which suggests the true optimum lies above it and was never
 tested; widening the sweep needs no retraining. Notebook 03 saves them to
 `results/thresholds.json`; the
@@ -165,7 +165,7 @@ that arrive without them.
 
 **Preprocessing must not drift.** `app/preprocessing.py` is a deliberate copy of
 the pipeline defined in notebook 03, because the models were fitted on that exact
-output. Notebook 03 also writes `results/pipeline_fixture.json` — a few
+output. Notebook 03 also writes `results/pipeline_fixture.json` - a few
 input/output pairs the serving copy can be checked against.
 
 **Reported metrics are development-split figures.** The test split is prepared but
@@ -174,7 +174,7 @@ deliberately left unconsumed so it stays a genuine holdout. Section 4.9 of noteb
 
 **Emoji density bounds everything.** Only a minority of tweets contain emoji, so
 the two tracks are byte-identical on most rows. A small aggregate effect is
-expected even when the effect on emoji-bearing tweets is large — which is why
+expected even when the effect on emoji-bearing tweets is large - which is why
 results are also reported per emotion.
 
 
