@@ -1,4 +1,4 @@
-# `03_model_train.ipynb` — Explanation
+# `03_model_train.ipynb` - Explanation
 
 **Stage 3 of 5.** Build the two parallel corpora the whole study rests on, then
 train both architectures on each of them. This is the notebook that produces
@@ -24,8 +24,8 @@ everything the Streamlit app serves.
 
 One preprocessing pipeline is built and **forked at exactly one operation**:
 
-* **Track A — `text_no_emoji`** — every emoji is deleted (`emoji.replace_emoji`).
-* **Track B — `text_with_emoji`** — every emoji is replaced by its Unicode
+* **Track A — `text_no_emoji`** - every emoji is deleted (`emoji.replace_emoji`).
+* **Track B — `text_with_emoji`** - every emoji is replaced by its Unicode
   description (`demoji.replace_with_desc`), so `😂` becomes `face with tears of joy`.
 
 Everything upstream and downstream of that fork is identical: same cleaning, same
@@ -41,14 +41,14 @@ That gives four comparable conditions:
 | **BiLSTM** | `lstm_no_emoji.keras` | `lstm_with_emoji.keras` |
 | **Transformer** | `bert_no_emoji.keras` | `bert_with_emoji.keras` |
 
-and a clean difference measure, `ΔF1 = F1(with emoji) − F1(without emoji)`, which
+and a clean difference measure, `ΔF1 = F1(with emoji) - F1(without emoji)`, which
 `04` computes.
 
 ---
 
 ## Walk-through
 
-### Cells 1–3 — setup
+### Cells 1-3 - setup
 
 `emoji` and `demoji` are imported with a `!pip install` fallback for Kaggle.
 NLTK data (`punkt`, `wordnet`, `omw-1.4`) is downloaded quietly.
@@ -68,20 +68,20 @@ FINAL_EPOCHS    = 10     # phase 2
 > had no internet. `WordNetLemmatizer` then falls back to returning tokens
 > unchanged for most inputs. The run completed and the models are valid, but this
 > means lemmatisation was largely inert in the shipped artefacts. If you re-run
-> locally with internet, lemmatisation *will* fire — which changes the vocabulary
+> locally with internet, lemmatisation *will* fire - which changes the vocabulary
 > slightly and means the retrained models will not be bit-identical to the shipped
 > ones. Both tracks are affected identically, so the comparison remains fair
 > either way.
 
-### 3.1 — The preprocessing pipeline
+### 3.1 - The preprocessing pipeline
 
 Five stages, of which stage 2 is the fork:
 
 | Stage | Function | What it does |
 |---|---|---|
 | 1 | `clean_text` | strip URLs, strip `@mentions`, drop the `#` but keep the word, collapse whitespace |
-| 2a | `handle_emoji_no` | **Track A** — delete every emoji |
-| 2b | `handle_emoji_yes` | **Track B** — replace each emoji with its description |
+| 2a | `handle_emoji_no` | **Track A** - delete every emoji |
+| 2b | `handle_emoji_yes` | **Track B** - replace each emoji with its description |
 | 3 | `normalize_text` | lowercase, replace non-alphanumerics with spaces |
 | 4 | `tokenize_text` | NLTK `TweetTokenizer`, dropping bare punctuation |
 | 5 | `lemmatize_tokens` | slang expansion (`u` → `you`, `cant` → `cannot`, …) then WordNet lemmatisation |
@@ -90,10 +90,10 @@ Five stages, of which stage 2 is the fork:
 
 > These functions are the **single source of truth** for what the models were
 > fitted on. `app/preprocessing.py` is a deliberate copy for serving. Change one
-> without the other and every prediction the UI makes becomes invalid — the model
+> without the other and every prediction the UI makes becomes invalid - the model
 > would receive text in a distribution it never saw during training.
 
-### Worked example — where the tracks diverge
+### Worked example - where the tracks diverge
 
 Run on a constructed sentence, so no corpus text is reproduced:
 
@@ -111,7 +111,7 @@ and note that half of them (`face`, `of`, `with`) carry no emotional content and
 simply dilute the sequence. That trade-off is exactly what the experiment
 measures.
 
-### 3.2 — Apply to every split, then check the fork actually worked
+### 3.2 - Apply to every split, then check the fork actually worked
 
 Both tracks are computed for all three splits and stored side by side in the same
 DataFrame. Two failure modes are then checked explicitly:
@@ -126,7 +126,7 @@ DataFrame. Two failure modes are then checked explicitly:
   (Emoji-only tweets would show up here — there are none in this corpus.)
 * **`% differing` tracks `02`'s emoji density**, as it must. It runs slightly
   higher (12.1% vs 11.3% on train) because this pipeline uses the `emoji` library
-  while `02` used a narrower regex — see the note in `02`'s explanation. If this
+  while `02` used a narrower regex - see the note in `02`'s explanation. If this
   column were ever `0`, the fork would have silently done nothing and the entire
   study would be measuring noise.
 * **Track B is consistently longer** (86.4 vs 82.4 characters on train), which is
@@ -163,35 +163,35 @@ pos_weight = (len(train) - pos_counts) / pos_counts
 `weighted_bce` applies these through
 `tf.nn.weighted_cross_entropy_with_logits`. A missed `trust` positive costs 18×
 what a false alarm does, which is what makes the rare emotions predictable at
-all — and also why every condition ends up recalling far more than it precisely
+all - and also why every condition ends up recalling far more than it precisely
 predicts (`04` §4.7).
 
-### 3.4 — Data pipeline and model builders
+### 3.4 - Data pipeline and model builders
 
 `make_vectorizer` adapts a `TextVectorization` layer **per track**, with
 `standardize=None` because normalisation already happened in the pipeline. This
 matters: Track B's vocabulary contains description words (`tears`, `loudly`,
 `weary`) that Track A's simply does not, so the two tracks genuinely see
-different vocabularies — that is the manipulation working, not a leak.
+different vocabularies - that is the manipulation working, not a leak.
 
 The vectoriser is baked **into the saved model** (the input is `dtype=tf.string`),
 which is why the app can feed raw preprocessed strings straight to
 `model.predict` with no separate tokeniser artefact to keep in sync.
 
-**BiLSTM arm** — embedding → BiLSTM(`lstm_units`, sequences) → BiLSTM(`lstm_units//2`)
+**BiLSTM arm** - embedding → BiLSTM(`lstm_units`, sequences) → BiLSTM(`lstm_units//2`)
 → dropout → dense(11).
 
 **Transformer arm** — embedding → multi-head self-attention → residual +
 layer-norm → feed-forward → residual + layer-norm → global average pool →
 dropout → dense(11). One encoder block, trained from scratch. **No positional
 encoding is added**, so with global average pooling this arm is close to
-order-insensitive — a known simplification, and part of why it underperforms the
+order-insensitive - a known simplification, and part of why it underperforms the
 BiLSTM here.
 
 Both heads emit **raw logits**, not probabilities. Every consumer must apply
-`tf.nn.sigmoid` itself — `04` does, and so does `app/inference.py`.
+`tf.nn.sigmoid` itself - `04` does, and so does `app/inference.py`.
 
-### 3.5 — Prediction and threshold selection
+### 3.5 - Prediction and threshold selection
 
 ```python
 def best_threshold(y_true, y_prob):
@@ -200,11 +200,11 @@ def best_threshold(y_true, y_prob):
 ```
 
 The threshold is swept on the development split and the Micro-F1 maximiser is
-adopted — applied identically in all four conditions, so it cannot favour one
+adopted - applied identically in all four conditions, so it cannot favour one
 track over the other.
 
 > ⚠️ **The sweep is truncated, and it binds.** `np.arange(0.1, 0.6, 0.05)` stops
-> at 0.55, and **all four conditions selected exactly 0.55** — the top of the
+> at 0.55, and **all four conditions selected exactly 0.55** - the top of the
 > range. That is the signature of an optimum lying at or beyond the boundary, so
 > the true Micro-F1 maximiser may well be above 0.55 and was never tested.
 > Widening the sweep (say to 0.95) is the single cheapest improvement available:
@@ -213,7 +213,7 @@ track over the other.
 > — the saved `results/thresholds.json` is `0.55` for all four. The comparison
 > between tracks is unaffected, since the same value applies to both.
 
-### 3.6 — Hyper-parameter grids
+### 3.6 - Hyper-parameter grids
 
 Three configurations per architecture, spanning capacity and learning rate in
 opposite directions:
@@ -226,7 +226,7 @@ opposite directions:
 The same budget is spent on all four conditions, which is what keeps the
 comparison fair.
 
-### 3.7 — Two-phase training
+### 3.7 - Two-phase training
 
 **Phase 1 (`search`)** trains each of the three configurations for up to 5 epochs,
 tunes a threshold, scores dev Micro-F1, and keeps the winner.
@@ -261,7 +261,7 @@ configuration-driven variation.
 
 Note also that the Transformer's two tracks picked **different** winning
 configurations (cfg1 without emoji, cfg3 with). That is the protocol working as
-designed — each condition gets its own best setup — but it does mean the
+designed - each condition gets its own best setup - but it does mean the
 Transformer's ΔF1 confounds "emoji helped" with "cfg3 happened to suit this
 track", which is worth stating when the number is quoted.
 
@@ -274,10 +274,10 @@ Transformer | Without Emoji  -> threshold 0.55 | dev Micro-F1 47.29%
 Transformer | With Emoji     -> threshold 0.55 | dev Micro-F1 51.00%
 ```
 
-### 3.8 — Persist everything
+### 3.8 - Persist everything
 
 The original `krish.ipynb` computed the tuned thresholds but **never wrote them to
-disk**, so they vanished when the kernel ended — and without them the served
+disk**, so they vanished when the kernel ended - and without them the served
 model falls back to 0.5 and stops predicting rare emotions almost entirely. That
 is the bug this section fixes.
 
@@ -322,7 +322,7 @@ therefore pins `keras>=3.13,<3.14`.
 **`SEED = 42` does not make GPU training deterministic.** cuDNN kernel selection
 and non-deterministic reductions mean a re-run will land a few tenths of a point
 away. Each condition was trained **once**, so there is no estimate of run-to-run
-variance — which is the core reason `04` calls the aggregate effect indicative
+variance - which is the core reason `04` calls the aggregate effect indicative
 rather than confirmed. Training each condition three times with different seeds
 would be the most valuable extension to this work.
 
