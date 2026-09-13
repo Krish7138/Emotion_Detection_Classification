@@ -1,4 +1,4 @@
-# Notebooks — Does the Emoji Matter?
+# Notebooks - Does the Emoji Matter?
 
 The four-stage pipeline behind the study. Each stage reads what the previous one
 wrote, so **run them in order**: `01` → `02` → `03` → `04`.
@@ -33,11 +33,11 @@ presentation and the report, not to the pipeline.
 | # | Notebook | In one line | Runtime |
 |---|---|---|---|
 | 1 | `01_data_load` | Load the corpus, standardise the schema, normalise labels, assert integrity | seconds, CPU |
-| 2 | `02_eda` | Profile the raw corpus — imbalance, co-occurrence, text noise, emoji density | <1 min, CPU |
+| 2 | `02_eda` | Profile the raw corpus - imbalance, co-occurrence, text noise, emoji density | <1 min, CPU |
 | 3 | `03_model_train` | Fork the pipeline into two tracks, train both architectures on each, save models + thresholds | ~75 min on a GPU |
 | 4 | `04_evaluation` | Score all four conditions, compute ΔF1, write every table and figure the report cites | ~2 min, CPU |
 
-Stage 3 is the only one the Streamlit UI strictly needs — it writes straight into
+Stage 3 is the only one the Streamlit UI strictly needs - it writes straight into
 the folders the app already reads, so there is no copying step.
 
 ---
@@ -71,9 +71,9 @@ description (`😂` → `face with tears of joy`). Everything upstream and downs
 is identical, so the only systematic difference between the two corpora is
 whether emoji content survives as text. Each track then trains both architectures
 under an identical protocol, giving four comparable conditions and a clean
-difference measure, `ΔF1 = F1(with emoji) − F1(without emoji)`.
+difference measure, `ΔF1 = F1(with emoji) - F1(without emoji)`.
 
-|  | Track A — no emoji | Track B — with emoji |
+|  | Track A - no emoji | Track B - with emoji |
 |---|---|---|
 | **BiLSTM** | `lstm_no_emoji.keras` | `lstm_with_emoji.keras` |
 | **Transformer** | `bert_no_emoji.keras` | `bert_with_emoji.keras` |
@@ -83,7 +83,7 @@ difference measure, `ΔF1 = F1(with emoji) − F1(without emoji)`.
 ## Headline results
 
 All figures are **development-split** (886 rows). The test split is prepared but
-deliberately unconsumed — `04` §4.9 runs it behind an opt-in flag.
+deliberately unconsumed - `04` §4.9 runs it behind an opt-in flag.
 
 | Model | Track | Micro F1 | Macro F1 | Mean AUC |
 |---|---|---|---|---|
@@ -92,14 +92,14 @@ deliberately unconsumed — `04` §4.9 runs it behind an opt-in flag.
 | Transformer | Without Emoji | 47.29 | 44.36 | 0.754 |
 | Transformer | With Emoji | 51.00 | 47.30 | 0.777 |
 
-**RQ1 — aggregate emoji effect:** +2.03 ΔMicro-F1 (BiLSTM), +3.71 (Transformer).
+**RQ1 - aggregate emoji effect:** +2.03 ΔMicro-F1 (BiLSTM), +3.71 (Transformer).
 Both positive; both smaller than the 7.38-point spread across hyper-parameter
 configurations, so **indicative rather than confirmed**.
 
-**RQ2 — does it depend on architecture and emotion?** On emotion, decisively:
-per-emotion ΔF1 spans 15.9 points (`anticipation` −4.13 → `sadness` +11.80),
-more than four times the largest aggregate effect. The emotions that gain —
-`sadness`, `fear`, `joy`, `love` — are exactly those `02` identified as
+**RQ2 - does it depend on architecture and emotion?** On emotion, decisively:
+per-emotion ΔF1 spans 15.9 points (`anticipation` -4.13 → `sadness` +11.80),
+more than four times the largest aggregate effect. The emotions that gain -
+`sadness`, `fear`, `joy`, `love` - are exactly those `02` identified as
 over-represented among emoji-bearing tweets.
 
 **The conclusion is therefore conditional:** emoji handling is a label-dependent
@@ -142,15 +142,15 @@ published state of the art for exactly this reason.
 
 **Every condition was trained once, with one seed.** There is no estimate of
 run-to-run variance, and configuration choice alone moves Micro-F1 by 7.38 points
-— twice the largest emoji effect measured. Training each condition across three
+- twice the largest emoji effect measured. Training each condition across three
 seeds is the most valuable extension available.
 
-**The development split did triple duty** — model selection, threshold selection
+**The development split did triple duty** - model selection, threshold selection
 and reporting. Absolute values are optimistic by construction. The bias applies
 equally to both tracks, so the comparison between them still holds.
 
 **The threshold sweep is truncated and it binds.** `03` sweeps `0.10 … 0.55`, and
-all four conditions selected exactly **0.55**, the top of the range — the
+all four conditions selected exactly **0.55**, the top of the range - the
 signature of an optimum at or beyond the boundary. Widening the sweep needs no
 retraining, only a re-scoring pass, and is the cheapest improvement available.
 (Note: the root README's claim that thresholds "land well below 0.5" does not
@@ -162,12 +162,12 @@ split the metrics come from it is about 75% of rows, not 89%.
 
 **NLTK downloads failed in the saved Kaggle run** (no internet), so lemmatisation
 was largely inert in the shipped models. Both tracks were affected identically,
-so the comparison is unaffected — but a local re-run *with* internet will
+so the comparison is unaffected - but a local re-run *with* internet will
 lemmatise properly and will not reproduce the checkpoints bit-for-bit.
 
 **Preprocessing must not drift.** `app/preprocessing.py` is a deliberate copy of
 the pipeline defined in `03`, because the models were fitted on that exact output.
-`03` also writes `results/pipeline_fixture.json` — input/output pairs the serving
+`03` also writes `results/pipeline_fixture.json` - input/output pairs the serving
 copy can be checked against.
 
 **Keras version drift is real.** The shipped models were saved by Keras 3.13.2 and
