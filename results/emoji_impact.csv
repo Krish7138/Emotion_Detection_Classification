@@ -1,0 +1,3 @@
+Model,d_micro_f1,d_macro_f1,Direction
+BiLSTM,2.03,0.99,emoji helps
+Transformer,3.71,2.94,emoji helps

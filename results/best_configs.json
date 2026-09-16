@@ -1,0 +1,38 @@
+{
+  "LSTM_no_emoji": {
+    "name": "cfg3",
+    "embed_dim": 128,
+    "lstm_units": 64,
+    "lr": 0.002,
+    "dropout": 0.1,
+    "batch_size": 64
+  },
+  "LSTM_with_emoji": {
+    "name": "cfg3",
+    "embed_dim": 128,
+    "lstm_units": 64,
+    "lr": 0.002,
+    "dropout": 0.1,
+    "batch_size": 64
+  },
+  "BERT_no_emoji": {
+    "name": "cfg1",
+    "embed_dim": 128,
+    "num_heads": 4,
+    "key_dim": 32,
+    "ff_dim": 256,
+    "lr": 0.001,
+    "dropout": 0.2,
+    "batch_size": 64
+  },
+  "BERT_with_emoji": {
+    "name": "cfg3",
+    "embed_dim": 128,
+    "num_heads": 2,
+    "key_dim": 64,
+    "ff_dim": 256,
+    "lr": 0.002,
+    "dropout": 0.1,
+    "batch_size": 64
+  }
+}
